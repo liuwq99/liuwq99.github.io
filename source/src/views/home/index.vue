@@ -1,26 +1,22 @@
 <template>
   <div>
-    <p>主页</p>
-    <button @click="onClickBtn">点击</button>
+    <van-button type="primary">主要按钮</van-button>
+    <p class="text">这是一个段落</p>
   </div>
 </template>
 
 <script setup lang="ts">
-import { useRouter } from "vue-router";
+import { Button } from "vant";
 
-const router = useRouter();
-const onClickBtn = () => {
-  router.push({
-    path: "/user",
-    query: {
-      id: 111,
-    },
-  });
-};
+defineOptions({
+  components: {
+    [Button.name]: Button,
+  },
+});
 </script>
 
 <style scoped lang="scss">
-div {
-  background: pink;
+.text {
+  font-size: 16px;
 }
 </style>
