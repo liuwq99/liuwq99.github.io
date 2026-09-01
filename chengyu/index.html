@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>成语实词背词助手</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #0f1419;
+        --bg-elev: #1a2028;
+        --bg-elev-2: #232a35;
+        --line: #2d3744;
+        --text: #e6edf3;
+        --text-soft: #c9d1d9;
+        --muted: #8b949e;
+        --primary: #4dabf7;
+        --primary-dark: #1e88e5;
+        --primary-bg: rgba(77, 171, 247, 0.12);
+        --accent: #ffb74d;
+        --accent-bg: rgba(255, 183, 77, 0.12);
+        --accent-text: #ffd180;
+        --error: #f48771;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        font-family: "Microsoft YaHei", "PingFang SC", -apple-system, sans-serif;
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.6;
+      }
+      .wrap {
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 24px 16px 60px;
+      }
+      h1 {
+        font-size: 22px;
+        margin: 0 0 4px;
+      }
+      .sub {
+        color: var(--muted);
+        font-size: 13px;
+        margin-bottom: 20px;
+      }
+      .card {
+        background: var(--bg-elev);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 18px;
+      }
+      label {
+        display: block;
+        font-weight: 600;
+        font-size: 14px;
+        margin-bottom: 8px;
+        color: var(--text-soft);
+      }
+      select {
+        width: 100%;
+        padding: 10px 12px;
+        font-size: 14px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        font-family: inherit;
+        background: var(--bg-elev-2);
+        color: var(--text);
+      }
+      .btn {
+        padding: 12px 18px;
+        font-size: 15px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        border: none;
+        font-family: inherit;
+      }
+      .btn:active {
+        filter: brightness(0.95);
+      }
+      .btn-primary {
+        background: var(--primary);
+        color: #0d1117;
+      }
+      .btn-primary:hover {
+        filter: brightness(1.1);
+      }
+      .btn-ghost {
+        background: none;
+        border: 1px solid var(--line);
+        color: var(--text-soft);
+      }
+      .btn-ghost:hover {
+        background: var(--primary-bg);
+        border-color: var(--primary);
+        color: var(--primary);
+      }
+      .btn-block {
+        width: 100%;
+      }
+      .btn:disabled {
+        opacity: 0.45;
+        cursor: default;
+        filter: none;
+      }
+      .mode-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-top: 16px;
+      }
+      .mode-card {
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 18px 14px;
+        text-align: center;
+        cursor: pointer;
+        background: var(--bg-elev-2);
+        transition: border-color 0.15s, background 0.15s;
+      }
+      .mode-card:hover {
+        border-color: var(--primary);
+        background: var(--primary-bg);
+      }
+      .mode-card .icon {
+        font-size: 26px;
+        display: block;
+        margin-bottom: 6px;
+      }
+      .mode-card .name {
+        font-weight: 700;
+        font-size: 15px;
+      }
+      .mode-card .desc {
+        color: var(--muted);
+        font-size: 12px;
+        margin-top: 4px;
+      }
+      .error {
+        color: var(--error);
+        font-size: 13px;
+        margin-top: 12px;
+        display: none;
+      }
+      .hint {
+        color: var(--muted);
+        font-size: 12px;
+        margin-top: 6px;
+      }
+
+      /* ---- 学习页 ---- */
+      .topbar {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 14px;
+      }
+      .topbar .mode-badge {
+        background: var(--primary);
+        color: #0d1117;
+        font-size: 12px;
+        font-weight: 700;
+        padding: 3px 10px;
+        border-radius: 12px;
+        flex-shrink: 0;
+      }
+      .topbar .mode-badge.quiz {
+        background: var(--accent);
+        color: #0d1117;
+      }
+      .topbar .title {
+        font-weight: 700;
+        font-size: 15px;
+        flex: 1;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        color: var(--text);
+      }
+      .topbar a.btn-ghost {
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 6px 14px;
+        font-size: 13px;
+      }
+      .study-card {
+        background: var(--bg-elev);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 24px 20px;
+        text-align: center;
+        margin-bottom: 14px;
+      }
+      .study-card .group-tag {
+        display: inline-block;
+        font-size: 12px;
+        color: var(--muted);
+        background: var(--bg-elev-2);
+        padding: 2px 10px;
+        border-radius: 12px;
+        margin-bottom: 14px;
+      }
+      .study-card .term {
+        font-size: 42px;
+        font-weight: 700;
+        letter-spacing: 4px;
+        line-height: 1.3;
+        word-break: break-all;
+        color: var(--text);
+      }
+      .study-card .pinyin {
+        font-size: 18px;
+        color: var(--primary);
+        margin-top: 6px;
+        letter-spacing: 1px;
+      }
+      .detail {
+        margin-top: 18px;
+        text-align: left;
+      }
+      .detail .section {
+        margin-bottom: 14px;
+      }
+      .detail .section-title {
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--primary);
+        margin-bottom: 6px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .detail .section-title::before {
+        content: "";
+        width: 4px;
+        height: 14px;
+        background: var(--primary);
+        border-radius: 2px;
+      }
+      .detail .section-body {
+        font-size: 14px;
+        color: var(--text-soft);
+      }
+      .detail ul {
+        margin: 0;
+        padding-left: 20px;
+        color: var(--text-soft);
+        font-size: 14px;
+      }
+      .detail ul li {
+        margin-bottom: 6px;
+      }
+      .memory-box {
+        background: var(--accent-bg);
+        border: 1px dashed var(--accent);
+        border-radius: 8px;
+        padding: 10px 12px;
+        font-size: 14px;
+        color: var(--accent-text);
+      }
+      .btn-reveal {
+        margin-top: 20px;
+      }
+
+      /* ---- 底部导航 ---- */
+      .bottom-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+      }
+      .bottom-bar .nav-btn {
+        flex: 1;
+        max-width: 130px;
+      }
+      .progress {
+        flex: 1;
+        text-align: center;
+      }
+      .progress .num {
+        font-size: 13px;
+        color: var(--muted);
+        margin-bottom: 6px;
+      }
+      .progress .bar {
+        height: 6px;
+        background: var(--bg-elev-2);
+        border-radius: 3px;
+        overflow: hidden;
+      }
+      .progress .bar-inner {
+        height: 100%;
+        background: var(--primary);
+        width: 0;
+        transition: width 0.2s;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <!-- 选择页 -->
+      <div id="pageSelect">
+        <div class="topbar">
+          <a class="btn btn-ghost" href="../index.html">← 返回首页</a>
+        </div>
+        <h1>📖 成语实词背词助手</h1>
+        <div class="sub">参考百词斩的交互理念：背题逐词学习，刷题先回忆再看答案</div>
+        <div class="card">
+          <label for="dataSelect">选择词库</label>
+          <select id="dataSelect"></select>
+          <div class="hint" id="packInfo"></div>
+          <div class="mode-row">
+            <div class="mode-card" data-mode="study">
+              <span class="icon">📘</span>
+              <div class="name">背题模式</div>
+              <div class="desc">逐词查看拼音、解释、例句与记忆方法</div>
+            </div>
+            <div class="mode-card" data-mode="quiz">
+              <span class="icon">✍️</span>
+              <div class="name">刷题模式</div>
+              <div class="desc">先看词与拼音，点击查看答案再揭晓</div>
+            </div>
+          </div>
+          <div class="error" id="selectError"></div>
+        </div>
+      </div>
+
+      <!-- 学习页 -->
+      <div id="pageStudy" style="display: none">
+        <div class="topbar">
+          <button class="btn btn-ghost" id="btnBack">← 返回</button>
+          <span class="mode-badge" id="modeBadge">背题</span>
+          <span class="title" id="packTitle"></span>
+        </div>
+
+        <div class="study-card">
+          <span class="group-tag" id="groupTag"></span>
+          <div class="term" id="termText"></div>
+          <div class="pinyin" id="pinyinText"></div>
+
+          <!-- 刷题模式：查看答案 -->
+          <div id="quizAction" style="display: none">
+            <button class="btn btn-primary btn-block btn-reveal" id="btnReveal">
+              查看答案
+            </button>
+          </div>
+
+          <div class="detail" id="detailBox" style="display: none">
+            <div class="section">
+              <div class="section-title">解释</div>
+              <div class="section-body" id="meaningText"></div>
+            </div>
+            <div class="section">
+              <div class="section-title">完整例句</div>
+              <ul id="exampleList"></ul>
+            </div>
+            <div class="section">
+              <div class="section-title">记忆方法</div>
+              <div class="memory-box" id="memoryText"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bottom-bar">
+          <button class="btn btn-ghost nav-btn" id="btnPrev">← 上一个</button>
+          <div class="progress">
+            <div class="num" id="progressText"></div>
+            <div class="bar"><div class="bar-inner" id="progressBar"></div></div>
+          </div>
+          <button class="btn btn-primary nav-btn" id="btnNext">下一个 →</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="data.js"></script>
+    <script>
+      const $ = (id) => document.getElementById(id);
+      const packs = window.CHENGYU_DATA || [];
+      let current = null; // 当前选中的词库包
+      let mode = "study"; // study | quiz
+      let index = 0; // 当前词条下标
+      let revealed = false; // 刷题模式是否已查看答案
+
+      // ---- 选择页 ----
+      function fillSelect() {
+        const sel = $("dataSelect");
+        sel.innerHTML = packs
+          .map(
+            (p) =>
+              `<option value="${p.key}">${escapeHtml(p.label)}${
+                p.来源 ? "　·　" + escapeHtml(p.来源.replace(/\.pdf$/, "")) : ""
+              }</option>`
+          )
+          .join("");
+        if (!packs.length) {
+          sel.innerHTML =
+            "<option value=''>暂无数据，请先运行 node build_data_js.js 生成 data.js</option>";
+          $("packInfo").textContent = "未找到任何词库。";
+        }
+        if (packs.length) onSelect();
+      }
+
+      function currentPack() {
+        return packs.find((p) => p.key === $("dataSelect").value) || packs[0];
+      }
+
+      function onSelect() {
+        const p = currentPack();
+        if (!p) return;
+        const groupNames = p.groups.map((g) => g.name).join("、");
+        $("packInfo").textContent = `${p.说明 ? p.说明 + "；" : ""}共 ${
+          p.count
+        } 条，分组：${groupNames}`;
+      }
+
+      function enterMode(m) {
+        const p = currentPack();
+        if (!p || !p.count) {
+          $("selectError").textContent = "该词库暂无词条，请换一个词库。";
+          $("selectError").style.display = "block";
+          return;
+        }
+        $("selectError").style.display = "none";
+        current = p;
+        mode = m;
+        index = 0;
+        revealed = false;
+        $("pageSelect").style.display = "none";
+        $("pageStudy").style.display = "block";
+        $("modeBadge").textContent = m === "study" ? "背题" : "刷题";
+        $("modeBadge").className = "mode-badge" + (m === "quiz" ? " quiz" : "");
+        $("quizAction").style.display = m === "quiz" ? "block" : "none";
+        $("packTitle").textContent = p.label;
+        renderCard();
+      }
+
+      function backToSelect() {
+        $("pageStudy").style.display = "none";
+        $("pageSelect").style.display = "block";
+      }
+
+      // ---- 学习页 ----
+      function flatEntries() {
+        const arr = [];
+        current.groups.forEach((g) =>
+          g.entries.forEach((e) => arr.push({ ...e, 组别: g.name }))
+        );
+        return arr;
+      }
+
+      function renderCard() {
+        const entries = flatEntries();
+        const item = entries[index];
+        $("groupTag").textContent = item.组别;
+        $("termText").textContent = item.词;
+        $("pinyinText").textContent = item.拼音;
+
+        // 背题模式直接展示详情；刷题模式默认隐藏
+        if (mode === "study") {
+          $("detailBox").style.display = "block";
+          $("quizAction").style.display = "none";
+        } else {
+          $("detailBox").style.display = revealed ? "block" : "none";
+          $("quizAction").style.display = "block";
+          $("btnReveal").textContent = revealed ? "收起答案" : "查看答案";
+        }
+        fillDetail(item);
+
+        $("progressText").textContent = `第 ${index + 1} / 共 ${entries.length} 条`;
+        $("progressBar").style.width = ((index + 1) / entries.length) * 100 + "%";
+        $("btnPrev").disabled = index === 0;
+        $("btnNext").disabled = index === entries.length - 1;
+      }
+
+      function fillDetail(item) {
+        $("meaningText").textContent = item.解释;
+        $("exampleList").innerHTML = (item.例句 || [])
+          .map((s) => `<li>${escapeHtml(s)}</li>`)
+          .join("");
+        $("memoryText").textContent = item.记忆方法;
+      }
+
+      function go(delta) {
+        const entries = flatEntries();
+        const next = index + delta;
+        if (next < 0 || next >= entries.length) return;
+        index = next;
+        revealed = false;
+        renderCard();
+      }
+
+      function toggleReveal() {
+        if (mode !== "quiz") return;
+        revealed = !revealed;
+        $("detailBox").style.display = revealed ? "block" : "none";
+        $("btnReveal").textContent = revealed ? "收起答案" : "查看答案";
+      }
+
+      // ---- 事件绑定 ----
+      $("dataSelect").addEventListener("change", onSelect);
+      document.querySelectorAll(".mode-card").forEach((el) => {
+        el.addEventListener("click", () => enterMode(el.dataset.mode));
+      });
+      $("btnBack").addEventListener("click", backToSelect);
+      $("btnPrev").addEventListener("click", () => go(-1));
+      $("btnNext").addEventListener("click", () => go(1));
+      $("btnReveal").addEventListener("click", toggleReveal);
+
+      document.addEventListener("keydown", (e) => {
+        if ($("pageStudy").style.display === "none") return;
+        if (e.key === "ArrowLeft") go(-1);
+        else if (e.key === "ArrowRight") go(1);
+        else if (mode === "quiz" && (e.key === " " || e.key === "Enter")) {
+          e.preventDefault();
+          toggleReveal();
+        }
+      });
+
+      function escapeHtml(s) {
+        const div = document.createElement("div");
+        div.textContent = s;
+        return div.innerHTML;
+      }
+
+      fillSelect();
+    </script>
+  </body>
+</html>

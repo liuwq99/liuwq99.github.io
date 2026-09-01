@@ -1,0 +1,1 @@
+import{d as s,c as _,a as t,u as a,o as r,_ as u}from"./index-372130a4.js";const c=s({__name:"index",setup(d){const n=a(),o=()=>{n.push({path:"/user",query:{id:111}})};return(p,e)=>(r(),_("div",null,[e[0]||(e[0]=t("p",null,"主页",-1)),t("button",{onClick:o},"点击")]))}});const i=u(c,[["__scopeId","data-v-a9b546fd"]]);export{i as default};

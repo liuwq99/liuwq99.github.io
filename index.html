@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>背词学习入口</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #0f1419;
+        --bg-elev: #1a2028;
+        --line: #2d3744;
+        --text: #e6edf3;
+        --text-soft: #c9d1d9;
+        --muted: #8b949e;
+        --primary: #4dabf7;
+        --primary-dark: #1e88e5;
+        --primary-bg: rgba(77, 171, 247, 0.12);
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        font-family: "Microsoft YaHei", "PingFang SC", -apple-system, sans-serif;
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.6;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .wrap {
+        max-width: 480px;
+        width: calc(100% - 32px);
+        margin: 0 auto;
+        background: var(--bg-elev);
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+        padding: 40px 32px;
+        text-align: center;
+        border: 1px solid var(--line);
+      }
+      h1 {
+        margin: 0 0 8px;
+        font-size: 24px;
+        color: var(--text);
+      }
+      p.sub {
+        margin: 0 0 32px;
+        color: var(--muted);
+        font-size: 14px;
+      }
+      .actions {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+      .btn {
+        display: block;
+        padding: 16px 24px;
+        font-size: 16px;
+        font-weight: 600;
+        text-decoration: none;
+        color: #0d1117;
+        background: var(--primary);
+        border-radius: 8px;
+        transition: background 0.15s ease;
+      }
+      .btn:hover {
+        background: var(--primary-dark);
+      }
+      .btn .desc {
+        display: block;
+        font-weight: 400;
+        font-size: 12px;
+        opacity: 0.85;
+        margin-top: 4px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <h1>背词学习</h1>
+      <p class="sub">选择要进入的功能</p>
+      <div class="actions">
+        <a class="btn" href="17day/index.html">
+          查看计划
+          <span class="desc">GRE 17 天背词计划表</span>
+        </a>
+        <a class="btn" href="chengyu/index.html">
+          开始学习
+          <span class="desc">成语实词背词助手</span>
+        </a>
+      </div>
+    </div>
+  </body>
+</html>

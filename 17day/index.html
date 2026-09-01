@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>背词计划表</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #0f1419;
+        --bg-elev: #1a2028;
+        --bg-elev-2: #232a35;
+        --line: #2d3744;
+        --text: #e6edf3;
+        --text-soft: #c9d1d9;
+        --muted: #8b949e;
+        --new-bg: rgba(77, 171, 247, 0.18);
+        --new-border: #4dabf7;
+        --new-text: #82c8ff;
+        --rev-bg: rgba(255, 183, 77, 0.18);
+        --rev-border: #ffb74d;
+        --rev-text: #ffd180;
+        --weekend: #f48771;
+        --error: #f48771;
+        --shadow: rgba(0, 0, 0, 0.4);
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        font-family: "Microsoft YaHei", "PingFang SC", -apple-system, sans-serif;
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.5;
+      }
+      .wrap {
+        max-width: 80%;
+        margin: 0 auto;
+        padding: 24px 16px 60px;
+      }
+      h1 {
+        font-size: 22px;
+        margin: 0 0 4px;
+      }
+      .sub {
+        color: var(--muted);
+        font-size: 13px;
+        margin-bottom: 18px;
+      }
+      .card {
+        background: var(--bg-elev);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 18px;
+        margin-bottom: 18px;
+      }
+      .field {
+        margin-bottom: 14px;
+      }
+      label {
+        display: block;
+        font-weight: 600;
+        font-size: 14px;
+        margin-bottom: 6px;
+        color: var(--text-soft);
+      }
+      .hint {
+        color: var(--muted);
+        font-size: 12px;
+        margin-top: 4px;
+      }
+      input[type="date"],
+      input[type="time"] {
+        width: 100%;
+        padding: 8px 10px;
+        font-size: 14px;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        font-family: inherit;
+        background: var(--bg-elev-2);
+        color: var(--text);
+      }
+      .row {
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap;
+      }
+      .row .field {
+        flex: 1;
+        min-width: 160px;
+      }
+      .btn {
+        padding: 8px 18px;
+        font-size: 14px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+        border: none;
+        font-family: inherit;
+      }
+      .btn-primary {
+        background: var(--new-border);
+        color: #0d1117;
+      }
+      .btn-primary:hover {
+        filter: brightness(1.1);
+      }
+      .btn-generate {
+        background: var(--new-border);
+        color: #0d1117;
+        padding: 10px 26px;
+        font-size: 15px;
+      }
+      .btn-generate:hover {
+        filter: brightness(1.1);
+      }
+      .error {
+        color: var(--error);
+        font-size: 13px;
+        margin-top: 10px;
+        display: none;
+      }
+      .meta {
+        font-size: 13px;
+        color: var(--muted);
+        margin-bottom: 12px;
+      }
+      .rule {
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .rule code {
+        background: var(--bg-elev-2);
+        padding: 1px 5px;
+        border-radius: 3px;
+        color: var(--text-soft);
+      }
+
+      /* 顶部 */
+      .topbar {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 12px;
+      }
+      .topbar a.btn-home {
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 6px 14px;
+        font-size: 13px;
+        background: none;
+        border: 1px solid var(--line);
+        color: var(--text-soft);
+        border-radius: 6px;
+        font-weight: 600;
+        font-family: inherit;
+      }
+      .topbar a.btn-home:hover {
+        background: var(--new-bg);
+        border-color: var(--new-border);
+        color: var(--new-text);
+      }
+
+      /* 词库多选 */
+      .pack-picker {
+        position: relative;
+        margin-bottom: 4px;
+      }
+      .pack-toggle {
+        width: 100%;
+        text-align: left;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 12px;
+        font-size: 14px;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        background: var(--bg-elev-2);
+        color: var(--text);
+        font-family: inherit;
+        cursor: pointer;
+      }
+      .pack-toggle:hover {
+        border-color: var(--new-border);
+      }
+      .pack-toggle .caret {
+        color: var(--muted);
+        font-size: 12px;
+      }
+      .pack-panel {
+        position: absolute;
+        top: calc(100% + 4px);
+        left: 0;
+        right: 0;
+        background: var(--bg-elev-2);
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        box-shadow: 0 6px 18px var(--shadow);
+        z-index: 10;
+        max-height: 360px;
+        display: flex;
+        flex-direction: column;
+      }
+      .pack-panel[hidden] {
+        display: none;
+      }
+      .pack-panel-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        border-bottom: 1px solid var(--line);
+        background: var(--bg-elev);
+        font-size: 13px;
+      }
+      .link-btn {
+        background: none;
+        border: none;
+        color: var(--new-text);
+        font-size: 13px;
+        cursor: pointer;
+        padding: 0;
+        font-family: inherit;
+      }
+      .link-btn:hover {
+        text-decoration: underline;
+      }
+      .pack-panel-header .sep {
+        color: var(--muted);
+      }
+      .pack-panel-hint {
+        margin-left: auto;
+        color: var(--muted);
+        font-size: 12px;
+      }
+      .pack-list {
+        overflow-y: auto;
+        flex: 1;
+        padding: 4px 0;
+      }
+      .pack-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 12px;
+        cursor: pointer;
+        font-size: 13px;
+        color: var(--text-soft);
+      }
+      .pack-item:hover {
+        background: var(--new-bg);
+      }
+      .pack-item input {
+        flex-shrink: 0;
+        margin: 0;
+        accent-color: var(--new-border);
+      }
+      .pack-item .name {
+        flex: 1;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      /* 日历 */
+      .legend {
+        font-size: 12px;
+        color: var(--muted);
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .legend-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+      }
+      .legend-item .tag {
+        font-size: 10px;
+        font-weight: 700;
+        padding: 0 4px;
+        border-radius: 3px;
+        line-height: 1.5;
+      }
+      .legend-item.new .tag {
+        background: var(--new-border);
+        color: #0d1117;
+      }
+      .legend-item.rev .tag {
+        background: var(--rev-border);
+        color: #0d1117;
+      }
+      .cal-nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 12px;
+        background: var(--bg-elev);
+        border-bottom: 1px solid var(--line);
+      }
+      .cal-nav-title {
+        font-weight: 700;
+        font-size: 15px;
+      }
+      .cal-nav-btn {
+        background: none;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        padding: 4px 12px;
+        font-size: 14px;
+        cursor: pointer;
+        font-family: inherit;
+        color: var(--text-soft);
+      }
+      .cal-nav-btn:hover {
+        background: var(--new-bg);
+        border-color: var(--new-border);
+        color: var(--new-text);
+      }
+      .cal-nav-btn:disabled {
+        color: var(--muted);
+        border-color: var(--line);
+        cursor: default;
+        background: none;
+      }
+      .cal-month {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        overflow: hidden;
+      }
+      .cal-grid {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 1px;
+        background: var(--line);
+      }
+      .cal-dow {
+        background: var(--bg-elev);
+        text-align: center;
+        font-size: 12px;
+        color: var(--muted);
+        padding: 5px 0;
+        font-weight: 600;
+      }
+      .cal-dow.weekend {
+        color: var(--weekend);
+      }
+      .cal-cell {
+        background: var(--bg-elev-2);
+        min-height: 112px;
+        padding: 5px;
+        display: flex;
+        flex-direction: column;
+      }
+      .cal-cell.out {
+        background: var(--bg-elev);
+      }
+      .cal-num {
+        font-size: 12px;
+        color: var(--muted);
+        margin-bottom: 3px;
+        font-weight: 600;
+      }
+      .cal-cell.weekend .cal-num {
+        color: var(--weekend);
+      }
+      .cal-cell.highlight {
+        background: rgba(77, 171, 247, 0.08);
+      }
+      .cal-content {
+        overflow-y: auto;
+        flex: 1;
+      }
+      .cal-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 4px;
+        font-size: 11px;
+        line-height: 1.35;
+        padding: 1px 4px;
+        margin-bottom: 2px;
+        border-radius: 3px;
+      }
+      .cal-item .tag {
+        flex-shrink: 0;
+        font-size: 10px;
+        font-weight: 700;
+        padding: 0 4px;
+        border-radius: 3px;
+        line-height: 1.5;
+      }
+      .cal-item .name {
+        flex: 1;
+        min-width: 0;
+        word-break: break-all;
+      }
+      .cal-item .src {
+        flex-shrink: 0;
+        color: var(--muted);
+        font-size: 10px;
+      }
+      .cal-item.new {
+        background: var(--new-bg);
+        color: var(--new-text);
+      }
+      .cal-item.new .tag {
+        background: var(--new-border);
+        color: #0d1117;
+      }
+      .cal-item.rev {
+        background: var(--rev-bg);
+        color: var(--rev-text);
+      }
+      .cal-item.rev .tag {
+        background: var(--rev-border);
+        color: #0d1117;
+      }
+
+      /* 移动端适配 */
+      /* @media (max-width: 640px) {
+        .wrap { max-width: 100%; padding: 16px 10px 40px; }
+        h1 { font-size: 18px; }
+        .card { padding: 12px; }
+        .cal-cell { min-height: 80px; padding: 3px; }
+        .cal-num { font-size: 11px; margin-bottom: 2px; }
+        .cal-item { font-size: 10px; padding: 1px 3px; margin-bottom: 1px; }
+        .cal-item .tag { font-size: 9px; }
+        .cal-item .src { display: none; }
+        .cal-dow { font-size: 11px; padding: 4px 0; }
+        .cal-nav-title { font-size: 14px; }
+        .cal-nav-btn { font-size: 12px; padding: 3px 8px; }
+        .row .field { min-width: 120px; }
+        .batch-tag { font-size: 12px; padding: 3px 8px; }
+        .btn-generate { padding: 8px 20px; font-size: 14px; }
+      }
+      @media (max-width: 420px) {
+        .cal-cell { min-height: 64px; }
+        .cal-item { font-size: 9px; line-height: 1.2; }
+        .cal-item .tag { padding: 0 3px; }
+        .cal-dow { font-size: 10px; }
+        .cal-nav { padding: 6px 8px; }
+        .cal-nav-btn { font-size: 11px; padding: 2px 6px; }
+      } */
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="topbar">
+        <a class="btn btn-ghost btn-home" href="../index.html">← 返回首页</a>
+      </div>
+      <h1>📘 GRE 17天背词计划表</h1>
+      <div class="sub">
+        基于艾宾浩斯遗忘曲线：学习后按 12小时 / 1天 / 2天 / 4天 / 7天 / 15天
+        复习
+      </div>
+
+      <div class="card">
+        <div class="field">
+          <label>学习批次</label>
+          <div class="pack-picker">
+            <button type="button" class="pack-toggle" id="packToggle">
+              <span id="packToggleText">已选 0 个词库</span>
+              <span class="caret">▾</span>
+            </button>
+            <div class="pack-panel" id="packPanel" hidden>
+              <div class="pack-panel-header">
+                <button type="button" class="link-btn" id="packAll">全选</button>
+                <span class="sep">·</span>
+                <button type="button" class="link-btn" id="packNone">清空</button>
+                <span class="pack-panel-hint">勾选要学习的词库</span>
+              </div>
+              <div class="pack-list" id="packList"></div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="field">
+            <label for="startDate">开始日期</label>
+            <input type="date" id="startDate" />
+          </div>
+          <div class="field">
+            <label for="dailyTime">每日学习时刻</label>
+            <input type="time" id="dailyTime" value="08:00" />
+            <div class="hint">「12小时后」复习即当天该时刻 +12 小时</div>
+          </div>
+        </div>
+        <button class="btn btn-generate" id="generate">生成计划</button>
+        <div class="error" id="error"></div>
+      </div>
+
+      <div class="card" id="result" style="display: none">
+        <div class="meta" id="meta"></div>
+        <div class="legend">
+          <span class="legend-item new"
+            ><span class="tag">学</span> 新学批次</span
+          >
+          <span class="legend-item rev"
+            ><span class="tag">复</span> 复习批次</span
+          >
+        </div>
+        <div id="calendarContainer"></div>
+      </div>
+
+      <div class="card rule">
+        <b>记忆法则说明</b><br />
+        每个批次在<b>学习当天</b>（每日时刻）开始学习，此后在第 1、2、4、7、15
+        天及当天的 <code>12 小时后</code>（即学习时刻 +12 小时）进行复习，共 6
+        次复习。每个日期格子内项数较多时，超过约 3 行会自动纵向滚动。
+      </div>
+    </div>
+
+    <script src="../chengyu/data.js"></script>
+    <script>
+      const $ = (id) => document.getElementById(id);
+
+      // ---- 词库多选（与 chengyu 同一份 data.js）----
+      const PACKS = Array.isArray(window.CHENGYU_DATA) ? window.CHENGYU_DATA : [];
+      // 已选词库的 key；默认全选
+      const batches = PACKS.map((p) => p.key);
+
+      function escapeHtml(s) {
+        const div = document.createElement("div");
+        div.textContent = s;
+        return div.innerHTML;
+      }
+
+      function updateToggleText() {
+        $("packToggleText").textContent = `已选 ${batches.length} 个词库`;
+      }
+
+      function renderPackList() {
+        const list = $("packList");
+        list.innerHTML = PACKS.map(
+          (p) => `<label class="pack-item">
+            <input type="checkbox" data-key="${escapeHtml(p.key)}"${
+            batches.includes(p.key) ? " checked" : ""
+          }>
+            <span class="name">${escapeHtml(p.label)}</span>
+          </label>`
+        ).join("");
+        list.querySelectorAll("input[type=checkbox]").forEach((cb) => {
+          cb.addEventListener("change", () => {
+            const k = cb.dataset.key;
+            const idx = batches.indexOf(k);
+            if (cb.checked && idx === -1) batches.push(k);
+            else if (!cb.checked && idx !== -1) batches.splice(idx, 1);
+            updateToggleText();
+          });
+        });
+      }
+
+      $("packToggle").addEventListener("click", (e) => {
+        e.stopPropagation();
+        const panel = $("packPanel");
+        panel.hidden = !panel.hidden;
+      });
+      $("packPanel").addEventListener("click", (e) => e.stopPropagation());
+      document.addEventListener("click", () => {
+        $("packPanel").hidden = true;
+      });
+      $("packAll").addEventListener("click", () => {
+        batches.length = 0;
+        PACKS.forEach((p) => batches.push(p.key));
+        updateToggleText();
+        renderPackList();
+      });
+      $("packNone").addEventListener("click", () => {
+        batches.length = 0;
+        updateToggleText();
+        renderPackList();
+      });
+
+      // ---- 日期工具 ----
+      function makeDate(y, m, d) {
+        return new Date(y, m - 1, d);
+      }
+      function toLocal(date) {
+        return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+      }
+      function addDays(date, n) {
+        const d = toLocal(date);
+        d.setDate(d.getDate() + n);
+        return d;
+      }
+      function fmt(date) {
+        return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
+          2,
+          "0"
+        )}-${String(date.getDate()).padStart(2, "0")}`;
+      }
+      function plus12h(time) {
+        const [h, m] = time.split(":").map(Number);
+        const total = (h + 12) * 60 + m;
+        const nh = Math.floor(total / 60) % 24;
+        const nm = total % 60;
+        return `${String(nh).padStart(2, "0")}:${String(nm).padStart(2, "0")}`;
+      }
+
+      // ---- 计划计算（逻辑不变）----
+      function computeSchedule(groups, startDate, dailyTime) {
+        const key = (d) => fmt(d);
+        const map = new Map();
+        const reviewTime = plus12h(dailyTime);
+        // 学习时刻 +12h 是否越过午夜（即复习落在次日）
+        const [rh, rm] = reviewTime.split(":").map(Number);
+        const [dh, dm] = dailyTime.split(":").map(Number);
+        const crossesMidnight =
+          rh * 60 + rm < dh * 60 + dm; // 复习时刻数值小于学习时刻 => 跨天
+
+        groups.forEach((g, i) => {
+          const learnDate = addDays(startDate, i);
+          const k = key(learnDate);
+          if (!map.has(k))
+            map.set(k, { date: learnDate, newList: [], revList: [] });
+          map.get(k).newList.push(i);
+
+          const intervals = [0, 1, 2, 4, 7, 15];
+          const labels = [
+            "12小时后",
+            "1天后",
+            "2天后",
+            "4天后",
+            "7天后",
+            "15天后",
+          ];
+          let current = learnDate;
+          intervals.forEach((offset, idx) => {
+            if (idx > 0) current = addDays(current, offset);
+            // 12小时后复习若跨天（如 19:00+12h=次日07:00），复习日再 +1 天
+            const revDate =
+              idx === 0 && crossesMidnight ? addDays(current, 1) : current;
+            const pk = key(revDate);
+            if (!map.has(pk))
+              map.set(pk, { date: revDate, newList: [], revList: [] });
+            map.get(pk).revList.push({
+              batch: i,
+              label: labels[idx],
+              time: reviewTime,
+            });
+          });
+        });
+
+        const sorted = [...map.values()].sort((a, b) => a.date - b.date);
+        const filled = [];
+        const start = toLocal(sorted[0].date);
+        const end = toLocal(sorted[sorted.length - 1].date);
+        let cur = start;
+        while (cur <= end) {
+          const k = key(cur);
+          filled.push(
+            map.has(k)
+              ? map.get(k)
+              : { date: toLocal(cur), newList: [], revList: [] }
+          );
+          cur = addDays(cur, 1);
+        }
+        return filled;
+      }
+
+      // ---- 日历渲染 ----
+      const DOW = ["一", "二", "三", "四", "五", "六", "日"];
+      let allMonths = []; // 所有月份数据
+      let curMonthIdx = 0; // 当前显示的月份索引
+      let groupsData = []; // 当前批次数据
+      let byDayMap = null; // 日期 -> 行 映射
+      let todayKey = "";
+
+      function groupByMonth(rows) {
+        const months = [];
+        let cur = null;
+        rows.forEach((r) => {
+          const mk = r.date.getFullYear() * 100 + r.date.getMonth();
+          if (!cur || cur.key !== mk) {
+            cur = {
+              key: mk,
+              year: r.date.getFullYear(),
+              month: r.date.getMonth(),
+              days: [],
+            };
+            months.push(cur);
+          }
+          cur.days.push(r);
+        });
+        return months;
+      }
+
+      function renderItem(itemType, name, src) {
+        const tag = itemType === "new" ? "学" : "复";
+        // 复习项在窄屏隐藏时间文字（.src 由 CSS 控制 display:none），PC 端显示
+        const srcHtml = src
+          ? `<span class="src">${escapeHtml(src)}</span>`
+          : "";
+        if (itemType === "rev") src = src && src.trim();
+        return `<div class="cal-item ${itemType}">
+                  <span class="tag">${tag}</span>
+                  <span class="name">${escapeHtml(name)}</span>
+                  ${srcHtml}
+                </div>`;
+      }
+
+      function renderMonth() {
+        if (!allMonths.length) return;
+        const m = allMonths[curMonthIdx];
+        const first = new Date(m.year, m.month, 1);
+        const offset = (first.getDay() + 6) % 7;
+        const total = new Date(m.year, m.month + 1, 0).getDate();
+
+        let grid = "";
+        for (let d = 0; d < 7; d++) {
+          const wd = d === 5 || d === 6;
+          grid += `<div class="cal-dow${wd ? " weekend" : ""}">${DOW[d]}</div>`;
+        }
+        for (let i = 0; i < offset; i++)
+          grid += '<div class="cal-cell out"></div>';
+
+        for (let day = 1; day <= total; day++) {
+          const date = new Date(m.year, m.month, day);
+          const k = fmt(date);
+          const row = byDayMap.get(k);
+          const dkey = date.getDay();
+          const isWeekend = dkey === 0 || dkey === 6;
+          const isToday = k === todayKey;
+
+          let content = "";
+          if (row) {
+            const items = [];
+            row.newList.forEach((i) =>
+              items.push(renderItem("new", `「${groupsData[i]}」`, ""))
+            );
+            row.revList.forEach((r) =>
+              items.push(
+                renderItem("rev", `「${groupsData[r.batch]}」`, r.label)
+              )
+            );
+            content = items.length
+              ? `<div class="cal-content">${items.join("")}</div>`
+              : "";
+          }
+
+          grid += `<div class="cal-cell${isWeekend ? " weekend" : ""}${
+            isToday ? " highlight" : ""
+          }">
+                      <div class="cal-num">${day}</div>
+                      ${content}
+                    </div>`;
+        }
+        const curLen = offset + total;
+        const pad = (7 - (curLen % 7)) % 7;
+        for (let i = 0; i < pad; i++)
+          grid += '<div class="cal-cell out"></div>';
+
+        const container = $("calendarContainer");
+        container.innerHTML = `<div class="cal-month">
+            <div class="cal-nav">
+              <button class="cal-nav-btn" id="prevMonth"${
+                curMonthIdx === 0 ? " disabled" : ""
+              }>&lt; 上月</button>
+              <span class="cal-nav-title">${m.year} 年 ${m.month + 1} 月</span>
+              <button class="cal-nav-btn" id="nextMonth"${
+                curMonthIdx === allMonths.length - 1 ? " disabled" : ""
+              }>下月 &gt;</button>
+            </div>
+            <div class="cal-grid">${grid}</div>
+          </div>`;
+
+        $("prevMonth").addEventListener("click", () => {
+          curMonthIdx--;
+          renderMonth();
+        });
+        $("nextMonth").addEventListener("click", () => {
+          curMonthIdx++;
+          renderMonth();
+        });
+      }
+
+      // ---- 主渲染 ----
+      function render() {
+        const start = $("startDate").value;
+        const time = $("dailyTime").value;
+        const err = $("error");
+        err.style.display = "none";
+
+        if (!batches.length) {
+          err.textContent = "请至少添加一个学习批次。";
+          err.style.display = "block";
+          return;
+        }
+        if (!start) {
+          err.textContent = "请选择开始日期。";
+          err.style.display = "block";
+          return;
+        }
+        if (!time) {
+          err.textContent = "请选择每日学习时刻。";
+          err.style.display = "block";
+          return;
+        }
+
+        const [y, m, d] = start.split("-").map(Number);
+        const startDate = makeDate(y, m, d);
+        const groups = [...batches];
+        const rows = computeSchedule(groups, startDate, time);
+
+        $("result").style.display = "block";
+        $("meta").textContent = `共 ${groups.length} 个批次，计划跨越 ${
+          rows.length
+        } 天（${fmt(startDate)} 至 ${fmt(
+          rows[rows.length - 1].date
+        )}）；每个批次学习当天 + 6 次复习。`;
+
+        groupsData = groups;
+        allMonths = groupByMonth(rows);
+        byDayMap = new Map(rows.map((r) => [fmt(r.date), r]));
+        todayKey = new Date().toISOString().slice(0, 10);
+        curMonthIdx = 0;
+        renderMonth();
+      }
+
+      $("generate").addEventListener("click", render);
+      $("startDate").value = "2026-09-01";
+      $("dailyTime").value = "07:00";
+      // 首次加载：渲染批次多选面板（默认全选），并自动生成计划
+      updateToggleText();
+      renderPackList();
+      render();
+    </script>
+  </body>
+</html>
