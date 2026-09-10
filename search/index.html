@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>查词搜索</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #0f1419;
+        --bg-elev: #1a2028;
+        --bg-elev-2: #232a35;
+        --line: #2d3744;
+        --text: #e6edf3;
+        --text-soft: #c9d1d9;
+        --muted: #8b949e;
+        --primary: #4dabf7;
+        --primary-dark: #1e88e5;
+        --primary-bg: rgba(77, 171, 247, 0.12);
+        --accent: #ffb74d;
+        --accent-bg: rgba(255, 183, 77, 0.12);
+        --accent-text: #ffd180;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        font-family: "Microsoft YaHei", "PingFang SC", -apple-system, sans-serif;
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.6;
+      }
+      .wrap {
+        max-width: 640px;
+        margin: 0 auto;
+        padding: 24px 16px 60px;
+      }
+      .topbar {
+        display: flex;
+        align-items: center;
+        margin-bottom: 14px;
+      }
+      .topbar a {
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 6px 14px;
+        font-size: 13px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        color: var(--text-soft);
+        background: none;
+      }
+      .topbar a:hover {
+        background: var(--primary-bg);
+        border-color: var(--primary);
+        color: var(--primary);
+      }
+      h1 {
+        font-size: 22px;
+        margin: 0 0 4px;
+      }
+      .sub {
+        color: var(--muted);
+        font-size: 13px;
+        margin-bottom: 20px;
+      }
+      .search-row {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+      }
+      input[type="text"] {
+        flex: 1;
+        min-width: 0;
+        padding: 12px 14px;
+        font-size: 16px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        font-family: inherit;
+        background: var(--bg-elev-2);
+        color: var(--text);
+      }
+      input[type="text"]:focus {
+        outline: none;
+        border-color: var(--primary);
+      }
+      input[type="text"]::placeholder {
+        color: var(--muted);
+      }
+      .btn {
+        padding: 12px 18px;
+        font-size: 15px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        border: none;
+        font-family: inherit;
+      }
+      .btn-primary {
+        background: var(--primary);
+        color: #0d1117;
+      }
+      .btn-primary:hover {
+        filter: brightness(1.1);
+      }
+      .btn:active {
+        filter: brightness(0.95);
+      }
+      .result {
+        background: var(--bg-elev);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 16px 18px;
+        margin-bottom: 14px;
+        cursor: pointer;
+      }
+      .result:hover {
+        border-color: var(--primary);
+      }
+      .result .term {
+        font-size: 24px;
+        font-weight: 700;
+        letter-spacing: 2px;
+        color: var(--text);
+      }
+      .result .pinyin {
+        font-size: 14px;
+        color: var(--primary);
+        margin-top: 2px;
+        letter-spacing: 1px;
+      }
+      .tags {
+        margin-top: 10px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .tag {
+        font-size: 12px;
+        color: var(--muted);
+        background: var(--bg-elev-2);
+        padding: 2px 10px;
+        border-radius: 12px;
+      }
+      .detail {
+        margin-top: 14px;
+        padding-top: 14px;
+        border-top: 1px solid var(--line);
+      }
+      .detail .section {
+        margin-bottom: 14px;
+      }
+      .detail .section:last-child {
+        margin-bottom: 0;
+      }
+      .detail .section-title {
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--primary);
+        margin-bottom: 6px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .detail .section-title::before {
+        content: "";
+        width: 4px;
+        height: 14px;
+        background: var(--primary);
+        border-radius: 2px;
+      }
+      .detail .section-body {
+        font-size: 14px;
+        color: var(--text-soft);
+      }
+      .detail ul {
+        margin: 0;
+        padding-left: 20px;
+        color: var(--text-soft);
+        font-size: 14px;
+      }
+      .detail ul li {
+        margin-bottom: 6px;
+      }
+      .memory-box {
+        background: var(--accent-bg);
+        border: 1px dashed var(--accent);
+        border-radius: 8px;
+        padding: 10px 12px;
+        font-size: 14px;
+        color: var(--accent-text);
+      }
+      .empty {
+        color: var(--muted);
+        font-size: 14px;
+        text-align: center;
+        padding: 32px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="topbar">
+        <a href="../index.html">← 返回首页</a>
+      </div>
+      <h1>🔍 查词搜索</h1>
+      <div class="sub">输入成语或实词（支持部分字），点击搜索查看词条</div>
+
+      <div class="search-row">
+        <input
+          type="text"
+          id="searchInput"
+          placeholder="例如：源远流长 或 源远"
+          autofocus
+        />
+        <button class="btn btn-primary" id="btnSearch">搜索</button>
+      </div>
+
+      <div id="results">
+        <div class="empty">输入关键词后点击「搜索」。</div>
+      </div>
+    </div>
+
+    <script src="../chengyu/data.js"></script>
+    <script>
+      const $ = (id) => document.getElementById(id);
+
+      // 展平全部词条，附上来源词库包
+      const allEntries = [];
+      (window.CHENGYU_DATA || []).forEach((p) =>
+        p.groups.forEach((g) =>
+          g.entries.forEach((e) => allEntries.push({ ...e, packLabel: p.label }))
+        )
+      );
+
+      function escapeHtml(s) {
+        const div = document.createElement("div");
+        div.textContent = s;
+        return div.innerHTML;
+      }
+
+      function search() {
+        const box = $("results");
+        if (!allEntries.length) {
+          box.innerHTML =
+            '<div class="empty">词库未加载，请确认 ../chengyu/data.js 存在。</div>';
+          return;
+        }
+        const q = $("searchInput").value.trim();
+        if (!q) {
+          box.innerHTML = '<div class="empty">请输入要查找的成语或实词。</div>';
+          return;
+        }
+        const hits = allEntries.filter((e) => e.词 && e.词.includes(q));
+        if (!hits.length) {
+          box.innerHTML = `<div class="empty">未找到包含「${escapeHtml(q)}」的词条。</div>`;
+          return;
+        }
+        box.innerHTML = hits
+          .map(
+            (e) => `
+          <div class="result">
+            <div class="result-head">
+              <div class="term">${escapeHtml(e.词)}</div>
+              <div class="pinyin">${escapeHtml(e.拼音)}</div>
+            </div>
+            <div class="tags">
+              <span class="tag">${escapeHtml(e.组别)}</span>
+              <span class="tag">${escapeHtml(e.packLabel)}</span>
+            </div>
+            <div class="detail" style="display: none">
+              <div class="section">
+                <div class="section-title">解释</div>
+                <div class="section-body">${escapeHtml(e.解释)}</div>
+              </div>
+              <div class="section">
+                <div class="section-title">完整例句</div>
+                <ul>${(e.例句 || []).map((s) => `<li>${escapeHtml(s)}</li>`).join("")}</ul>
+              </div>
+              <div class="section">
+                <div class="section-title">记忆方法</div>
+                <div class="memory-box">${escapeHtml(e.记忆方法)}</div>
+              </div>
+            </div>
+          </div>`
+          )
+          .join("");
+        const first = box.querySelector(".detail");
+        if (first) first.style.display = "block";
+      }
+
+      // 点击结果卡片展开/收起详情
+      $("results").addEventListener("click", (e) => {
+        const card = e.target.closest(".result");
+        if (!card) return;
+        const detail = card.querySelector(".detail");
+        if (detail)
+          detail.style.display = detail.style.display === "none" ? "block" : "none";
+      });
+
+      $("btnSearch").addEventListener("click", search);
+      $("searchInput").addEventListener("keydown", (e) => {
+        if (e.key === "Enter") search();
+      });
+    </script>
+  </body>
+</html>
