@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>词义练习</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #0f1419;
+        --bg-elev: #1a2028;
+        --bg-elev-2: #232a35;
+        --line: #2d3744;
+        --text: #e6edf3;
+        --text-soft: #c9d1d9;
+        --muted: #8b949e;
+        --primary: #4dabf7;
+        --primary-dark: #1e88e5;
+        --primary-bg: rgba(77, 171, 247, 0.12);
+        --accent: #ffb74d;
+        --accent-bg: rgba(255, 183, 77, 0.12);
+        --accent-text: #ffd180;
+        --ok: #51cf66;
+        --ok-bg: rgba(81, 207, 102, 0.12);
+        --error: #f48771;
+        --error-bg: rgba(244, 135, 113, 0.12);
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        font-family: "Microsoft YaHei", "PingFang SC", -apple-system, sans-serif;
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.6;
+      }
+      .wrap {
+        max-width: 640px;
+        margin: 0 auto;
+        padding: 24px 16px 60px;
+      }
+      h1 {
+        font-size: 22px;
+        margin: 0 0 4px;
+      }
+      .sub {
+        color: var(--muted);
+        font-size: 13px;
+        margin-bottom: 20px;
+      }
+      .card {
+        background: var(--bg-elev);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 18px;
+      }
+      label {
+        display: block;
+        font-weight: 600;
+        font-size: 14px;
+        margin-bottom: 8px;
+        color: var(--text-soft);
+      }
+      input[type="number"] {
+        width: 100%;
+        padding: 10px 12px;
+        font-size: 16px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        font-family: inherit;
+        background: var(--bg-elev-2);
+        color: var(--text);
+      }
+      input[type="number"]:focus {
+        outline: none;
+        border-color: var(--primary);
+      }
+      .hint {
+        color: var(--muted);
+        font-size: 12px;
+        margin-top: 6px;
+      }
+      .error {
+        color: var(--error);
+        font-size: 13px;
+        margin-top: 12px;
+        display: none;
+      }
+      .btn {
+        padding: 12px 18px;
+        font-size: 15px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        border: none;
+        font-family: inherit;
+      }
+      .btn:active {
+        filter: brightness(0.95);
+      }
+      .btn:disabled {
+        opacity: 0.45;
+        cursor: default;
+        filter: none;
+      }
+      .btn-primary {
+        background: var(--primary);
+        color: #0d1117;
+      }
+      .btn-primary:hover:not(:disabled) {
+        filter: brightness(1.1);
+      }
+      .btn-ghost {
+        background: none;
+        border: 1px solid var(--line);
+        color: var(--text-soft);
+      }
+      .btn-ghost:hover:not(:disabled) {
+        background: var(--primary-bg);
+        border-color: var(--primary);
+        color: var(--primary);
+      }
+      .btn-block {
+        width: 100%;
+        display: block;
+      }
+      .btn-block + .btn-block {
+        margin-top: 12px;
+      }
+      .nav-fixed {
+        position: fixed;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 40;
+        padding: 12px;
+        font-size: 14px;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+        writing-mode: vertical-rl;
+        letter-spacing: 2px;
+      }
+      #btnPrev {
+        left: 10px;
+      }
+      #btnNext {
+        right: 10px;
+      }
+      .topbar {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 14px;
+      }
+      .topbar a,
+      .btn-quit {
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 6px 14px;
+        font-size: 13px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        color: var(--text-soft);
+        background: none;
+        cursor: pointer;
+        font-family: inherit;
+        flex-shrink: 0;
+      }
+      .topbar a:hover,
+      .btn-quit:hover {
+        background: var(--primary-bg);
+        border-color: var(--primary);
+        color: var(--primary);
+      }
+      .badge {
+        background: var(--accent);
+        color: #0d1117;
+        font-size: 12px;
+        font-weight: 700;
+        padding: 3px 10px;
+        border-radius: 12px;
+        flex-shrink: 0;
+      }
+      .progress-text {
+        font-size: 13px;
+        color: var(--muted);
+        flex: 1;
+        text-align: center;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .score-text {
+        font-size: 13px;
+        color: var(--muted);
+        flex-shrink: 0;
+      }
+      .score-text .ok {
+        color: var(--ok);
+      }
+      .score-text .bad {
+        color: var(--error);
+      }
+      .study-card {
+        background: var(--bg-elev);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 24px 20px;
+        text-align: center;
+        margin-bottom: 16px;
+      }
+      .group-tag {
+        display: inline-block;
+        font-size: 12px;
+        color: var(--muted);
+        background: var(--bg-elev-2);
+        padding: 2px 10px;
+        border-radius: 12px;
+        margin-bottom: 14px;
+      }
+      .study-card .term {
+        font-size: 40px;
+        font-weight: 700;
+        letter-spacing: 4px;
+        line-height: 1.3;
+        word-break: break-all;
+        color: var(--text);
+      }
+      .study-card .pinyin {
+        font-size: 17px;
+        color: var(--primary);
+        margin-top: 6px;
+        letter-spacing: 1px;
+      }
+      .opt {
+        display: block;
+        width: 100%;
+        text-align: left;
+        background: var(--bg-elev-2);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 12px 14px;
+        margin-bottom: 10px;
+        color: var(--text-soft);
+        font-size: 14px;
+        font-family: inherit;
+        line-height: 1.6;
+        cursor: pointer;
+      }
+      .opt:hover:not(.locked) {
+        border-color: var(--primary);
+      }
+      .opt.locked {
+        cursor: default;
+      }
+      .opt.correct {
+        border-color: var(--ok);
+        background: var(--ok-bg);
+        color: var(--text);
+      }
+      .opt.wrong {
+        border-color: var(--error);
+        background: var(--error-bg);
+        color: var(--text);
+      }
+      .opt .opt-tag {
+        display: inline-block;
+        font-size: 12px;
+        font-weight: 700;
+        padding: 1px 8px;
+        border-radius: 10px;
+        margin-bottom: 4px;
+      }
+      .opt.correct .opt-tag {
+        color: var(--ok);
+        background: rgba(81, 207, 102, 0.18);
+      }
+      .opt.wrong .opt-tag {
+        color: var(--error);
+        background: rgba(244, 135, 113, 0.18);
+      }
+      .result-num {
+        font-size: 40px;
+        font-weight: 700;
+        margin: 6px 0 2px;
+      }
+      .result-num .ok {
+        color: var(--ok);
+      }
+      .result-num .bad {
+        color: var(--error);
+      }
+      .tag {
+        font-size: 12px;
+        color: var(--muted);
+        background: var(--bg-elev-2);
+        padding: 2px 10px;
+        border-radius: 12px;
+      }
+      .opt .opt-text {
+        display: block;
+      }
+      .opt .opt-detail {
+        display: inline-block;
+        margin-top: 8px;
+        font-size: 12px;
+        color: var(--primary);
+        background: var(--primary-bg);
+        border: 1px solid var(--primary);
+        border-radius: 6px;
+        padding: 2px 10px;
+        cursor: pointer;
+      }
+      .opt .opt-detail:hover {
+        filter: brightness(1.25);
+      }
+      #modalOverlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.65);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        z-index: 50;
+      }
+      .modal {
+        position: relative;
+        background: var(--bg-elev);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        max-width: 560px;
+        width: 100%;
+        max-height: 80vh;
+        overflow-y: auto;
+        padding: 20px;
+      }
+      .modal-close {
+        position: absolute;
+        top: 10px;
+        right: 12px;
+        background: none;
+        border: none;
+        color: var(--muted);
+        font-size: 20px;
+        cursor: pointer;
+        line-height: 1;
+        padding: 4px;
+      }
+      .modal-close:hover {
+        color: var(--text);
+      }
+      .modal .term {
+        font-size: 28px;
+        font-weight: 700;
+        letter-spacing: 2px;
+        color: var(--text);
+        padding-right: 30px;
+        word-break: break-all;
+      }
+      .modal .pinyin {
+        font-size: 15px;
+        color: var(--primary);
+        margin-top: 2px;
+        letter-spacing: 1px;
+      }
+      .modal .tags {
+        margin-top: 8px;
+      }
+      .modal .section {
+        margin-top: 16px;
+      }
+      .modal .section-title {
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--primary);
+        margin-bottom: 6px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .modal .section-title::before {
+        content: "";
+        width: 4px;
+        height: 14px;
+        background: var(--primary);
+        border-radius: 2px;
+      }
+      .modal .section-body {
+        font-size: 14px;
+        color: var(--text-soft);
+      }
+      .modal ul {
+        margin: 0;
+        padding-left: 20px;
+        color: var(--text-soft);
+        font-size: 14px;
+      }
+      .modal ul li {
+        margin-bottom: 6px;
+      }
+      .modal .memory-box {
+        background: var(--accent-bg);
+        border: 1px dashed var(--accent);
+        border-radius: 8px;
+        padding: 10px 12px;
+        font-size: 14px;
+        color: var(--accent-text);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <!-- 设置页 -->
+      <div id="pageSetup">
+        <div class="topbar">
+          <a href="../index.html">← 返回首页</a>
+        </div>
+        <h1>✏️ 词义练习</h1>
+        <div class="sub">随机抽取成语，从同组成语的解释中选出正确的</div>
+        <div class="card">
+          <label for="countInput">练习数量</label>
+          <input type="number" id="countInput" value="30" min="1" />
+          <div class="hint" id="setupHint"></div>
+          <div class="error" id="setupError"></div>
+          <button class="btn btn-primary btn-block" id="btnStart" style="margin-top: 16px">
+            开始练习
+          </button>
+        </div>
+      </div>
+
+      <!-- 答题页 -->
+      <div id="pageQuiz" style="display: none">
+        <div class="topbar">
+          <button class="btn-quit" id="btnQuit">退出</button>
+          <span class="badge" id="modeBadge">练习</span>
+          <span class="progress-text" id="progressText"></span>
+          <span class="score-text" id="scoreText"></span>
+        </div>
+        <div class="study-card">
+          <span class="group-tag" id="groupTag"></span>
+          <div class="term" id="termText"></div>
+          <div class="pinyin" id="pinyinText"></div>
+        </div>
+        <div id="options"></div>
+
+        <button class="btn btn-ghost nav-fixed" id="btnPrev" style="display: none">
+          上一题
+        </button>
+        <button class="btn btn-primary nav-fixed" id="btnNext" style="display: none">
+          下一题
+        </button>
+      </div>
+
+      <!-- 结果页 -->
+      <div id="pageResult" style="display: none">
+        <div class="topbar">
+          <a href="../index.html">← 返回首页</a>
+        </div>
+        <div class="study-card">
+          <div class="sub" style="margin-bottom: 0">练习完成</div>
+          <div class="result-num">
+            <span class="ok" id="okCount">0</span> 对
+            ·
+            <span class="bad" id="badCount">0</span> 错
+          </div>
+          <div class="hint" id="resultHint"></div>
+        </div>
+        <button class="btn btn-primary btn-block" id="btnReview">进入错题回顾</button>
+        <button class="btn btn-ghost btn-block" id="btnAgain">再练一组</button>
+      </div>
+
+    </div>
+
+    <!-- 词条详情弹窗 -->
+    <div id="modalOverlay" style="display: none">
+      <div class="modal">
+        <button class="modal-close" id="modalClose" title="关闭">×</button>
+        <div id="modalBody"></div>
+      </div>
+    </div>
+
+    <script src="../chengyu/data.js"></script>
+    <script>
+      const $ = (id) => document.getElementById(id);
+
+      // 只取成语（排除「下册实词」开头的词库包），并按 词库包+组别 建立分组索引
+      const groupMap = {};
+      const allEntries = [];
+      (window.CHENGYU_DATA || []).forEach((p) => {
+        if (p.key.startsWith("下册实词")) return;
+        p.groups.forEach((g) =>
+          g.entries.forEach((e) => {
+            const item = { ...e, packKey: p.key };
+            if (item.解释) {
+              allEntries.push(item);
+              const k = p.key + "|" + e.组别;
+              (groupMap[k] = groupMap[k] || []).push(item);
+            }
+          })
+        );
+      });
+
+      function escapeHtml(s) {
+        const div = document.createElement("div");
+        div.textContent = s;
+        return div.innerHTML;
+      }
+
+      function shuffle(arr) {
+        for (let i = arr.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+      }
+
+      function showView(id) {
+        ["pageSetup", "pageQuiz", "pageResult"].forEach((v) => {
+          $(v).style.display = v === id ? "block" : "none";
+        });
+        window.scrollTo(0, 0);
+      }
+
+      // ---- 练习状态 ----
+      let practice = null; // 练习主会话 { questions, qIndex, correct, wrong }
+      let session = null; // 当前会话（练习或错题回顾）
+      let reviewMode = false;
+      let locked = false; // 当前题是否已作答
+
+      // ---- 设置页 ----
+      function fillSetupHint() {
+        $("setupHint").textContent = `词库共 ${allEntries.length} 条成语，题目从同组成语的解释中作答。`;
+      }
+
+      function startPractice() {
+        const err = $("setupError");
+        err.style.display = "none";
+        if (!allEntries.length) {
+          err.textContent = "词库未加载，请确认 ../chengyu/data.js 存在。";
+          err.style.display = "block";
+          return;
+        }
+        let n = parseInt($("countInput").value, 10);
+        if (isNaN(n) || n < 1) n = 1;
+        if (n > allEntries.length) {
+          n = allEntries.length;
+          $("countInput").value = n;
+          err.textContent = `练习数量已调整为词库上限 ${n} 条。`;
+          err.style.display = "block";
+        }
+        practice = {
+          questions: shuffle(allEntries.slice()).slice(0, n),
+          qIndex: 0,
+          correct: 0,
+          wrong: [],
+          answers: {}, // 题号 -> { picked, ok } 作答记录，供上一题回显
+          optCache: {}, // 题号 -> 选项数组，保证回看时选项顺序不变
+        };
+        session = practice;
+        reviewMode = false;
+        $("modeBadge").textContent = "练习";
+        showView("pageQuiz");
+        renderQuestion();
+      }
+
+      // ---- 错题回顾：复用练习答题页，只看做错的词 ----
+      function startReview() {
+        if (!practice || !practice.wrong.length) return;
+        session = {
+          questions: practice.wrong.slice(), // { entry, picked } 完整错题记录
+          qIndex: 0,
+          correct: 0,
+          wrong: [],
+          answers: {},
+          optCache: {},
+        };
+        reviewMode = true;
+        $("modeBadge").textContent = "回顾";
+        showView("pageQuiz");
+        renderQuestion();
+      }
+
+      // ---- 答题页 ----
+      let optionData = []; // 当前题的选项数据，与渲染顺序一致
+
+      function buildOptions(entry, key) {
+        // 选项 = 同词库包同组别的全部成员（含自身，有几条显示几条）；按题号缓存，回看时顺序不变
+        if (session.optCache[key]) {
+          optionData = session.optCache[key];
+          return optionData;
+        }
+        const members = groupMap[entry.packKey + "|" + entry.组别] || [entry];
+        optionData = shuffle(
+          members.filter((m) => m.解释).map((m) => ({ entry: m, text: m.解释 }))
+        );
+        session.optCache[key] = optionData;
+        return optionData;
+      }
+
+      function addTag(el, text) {
+        const t = document.createElement("div");
+        t.className = "opt-tag";
+        t.textContent = text;
+        el.prepend(t);
+      }
+
+      function renderQuestion() {
+        locked = false;
+        const q = session.questions[session.qIndex];
+        const item = reviewMode ? q.entry : q;
+        const idx = session.qIndex;
+        $("progressText").textContent = `第 ${idx + 1} / 共 ${session.questions.length} 题`;
+        renderScore();
+        $("groupTag").textContent = item.组别;
+        $("termText").textContent = item.词;
+        $("pinyinText").textContent = item.拼音;
+        const options = buildOptions(item, idx);
+        $("options").innerHTML = options
+          .map(
+            (o, i) => `
+          <div class="opt" data-i="${i}">
+            <span class="opt-text">${escapeHtml(o.text)}</span>
+            <span class="opt-detail">详情</span>
+          </div>`
+          )
+          .join("");
+        const opts = Array.from($("options").querySelectorAll(".opt"));
+
+        // 导航按钮常显；未作答时点击「下一题」不跳题（见 nextQuestion 守卫）
+        $("btnPrev").style.display = "block";
+        $("btnNext").style.display = "block";
+        if (reviewMode) {
+          // 回顾模式：进入即标识正确项与当时选错的项，不可再作答
+          locked = true;
+          const correctText = item.解释;
+          optionData.forEach((o, i) => {
+            opts[i].classList.add("locked");
+            if (o.text === correctText) {
+              opts[i].classList.add("correct");
+              addTag(opts[i], "正确答案");
+            }
+            if (o.entry === q.picked) opts[i].classList.add("wrong");
+          });
+          $("btnNext").textContent =
+            idx === session.questions.length - 1 ? "完成回顾" : "下一题";
+        } else {
+          // 练习模式：已答过的题回显作答情况，未答的题正常作答
+          const ans = session.answers[idx];
+          if (ans) {
+            locked = true;
+            const correctText = item.解释;
+            optionData.forEach((o, i) => {
+              opts[i].classList.add("locked");
+              if (o.text === correctText) {
+                opts[i].classList.add("correct");
+                addTag(opts[i], "正确答案");
+              }
+              if (!ans.ok && o.entry === ans.picked) opts[i].classList.add("wrong");
+            });
+            $("btnNext").textContent =
+              idx === session.questions.length - 1 ? "查看结果" : "下一题";
+          } else {
+            $("btnNext").textContent = "下一题";
+          }
+        }
+      }
+
+      function renderScore() {
+        $("scoreText").style.display = reviewMode ? "none" : "inline";
+        if (!reviewMode) {
+          $("scoreText").innerHTML = `<span class="ok">对 ${session.correct}</span> · <span class="bad">错 ${session.wrong.length}</span>`;
+        }
+      }
+
+      function pickOption(btn) {
+        if (locked) return;
+        locked = true;
+        const q = session.questions[session.qIndex];
+        const idx = session.qIndex;
+        const correctText = q.解释;
+        const picked = optionData[+btn.dataset.i];
+        const ok = picked.text === correctText;
+        const opts = Array.from($("options").querySelectorAll(".opt"));
+        optionData.forEach((o, i) => {
+          const el = opts[i];
+          el.classList.add("locked");
+          if (o.text === correctText) {
+            el.classList.add("correct");
+            addTag(el, "正确答案");
+          }
+        });
+        session.answers[idx] = { picked: picked.entry, ok };
+        if (ok) {
+          session.correct++;
+          renderScore();
+          setTimeout(() => {
+            if (!reviewMode && session && session.qIndex === idx) nextQuestion();
+          }, 600);
+        } else {
+          btn.classList.add("wrong");
+          session.wrong.push({ entry: q, picked: picked.entry });
+          renderScore();
+          $("btnNext").style.display = "block";
+          $("btnNext").textContent =
+            idx === session.questions.length - 1 ? "查看结果" : "下一题";
+        }
+      }
+
+      function nextQuestion() {
+        // 练习模式未作答时不可跳过（按钮常显，点了无效）
+        if (!reviewMode && !session.answers[session.qIndex]) return;
+        if (session.qIndex >= session.questions.length - 1) {
+          renderResult();
+          return;
+        }
+        session.qIndex++;
+        renderQuestion();
+      }
+
+      function prevQuestion() {
+        if (session.qIndex <= 0) return;
+        session.qIndex--;
+        renderQuestion();
+      }
+
+      // ---- 结果页 ----
+      function renderResult() {
+        const ok = practice.correct;
+        const bad = practice.wrong.length;
+        $("okCount").textContent = ok;
+        $("badCount").textContent = bad;
+        $("resultHint").textContent = bad
+          ? `共答 ${ok + bad} 题，点击下方按钮回顾错题。`
+          : "全部答对，太棒了！";
+        $("btnReview").disabled = !bad;
+        showView("pageResult");
+      }
+
+      // ---- 词条详情弹窗 ----
+      function openModal(entry) {
+        $("modalBody").innerHTML = `
+          <div class="term">${escapeHtml(entry.词)}</div>
+          <div class="pinyin">${escapeHtml(entry.拼音)}</div>
+          <div class="tags"><span class="tag">${escapeHtml(entry.组别)}</span></div>
+          <div class="section">
+            <div class="section-title">解释</div>
+            <div class="section-body">${escapeHtml(entry.解释)}</div>
+          </div>
+          <div class="section">
+            <div class="section-title">完整例句</div>
+            <ul>${(entry.例句 || []).map((s) => `<li>${escapeHtml(s)}</li>`).join("")}</ul>
+          </div>
+          <div class="section">
+            <div class="section-title">记忆方法</div>
+            <div class="memory-box">${escapeHtml(entry.记忆方法)}</div>
+          </div>`;
+        $("modalOverlay").style.display = "flex";
+      }
+
+      function closeModal() {
+        $("modalOverlay").style.display = "none";
+      }
+
+      // ---- 事件绑定 ----
+      $("btnStart").addEventListener("click", startPractice);
+      $("countInput").addEventListener("keydown", (e) => {
+        if (e.key === "Enter") startPractice();
+      });
+      $("btnQuit").addEventListener("click", () => {
+        showView(reviewMode ? "pageResult" : "pageSetup");
+        if (!reviewMode) fillSetupHint();
+      });
+      $("options").addEventListener("click", (e) => {
+        const detail = e.target.closest(".opt-detail");
+        if (detail) {
+          const o = optionData[+detail.closest(".opt").dataset.i];
+          openModal(o.entry);
+          return;
+        }
+        const btn = e.target.closest(".opt");
+        if (btn) pickOption(btn);
+      });
+      $("btnNext").addEventListener("click", nextQuestion);
+      $("btnPrev").addEventListener("click", prevQuestion);
+      $("btnReview").addEventListener("click", startReview);
+      $("btnAgain").addEventListener("click", () => {
+        showView("pageSetup");
+        fillSetupHint();
+      });
+
+      // ---- 详情弹窗事件 ----
+      $("modalClose").addEventListener("click", closeModal);
+      $("modalOverlay").addEventListener("click", (e) => {
+        if (e.target === $("modalOverlay")) closeModal();
+      });
+
+      document.addEventListener("keydown", (e) => {
+        if ($("modalOverlay").style.display !== "none") {
+          if (e.key === "Escape") closeModal();
+          return;
+        }
+        if ($("pageQuiz").style.display === "none") return;
+        if (e.key === "Enter" && $("btnNext").style.display !== "none") {
+          e.preventDefault();
+          nextQuestion();
+        }
+      });
+
+      fillSetupHint();
+    </script>
+  </body>
+</html>
