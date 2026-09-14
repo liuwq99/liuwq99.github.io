@@ -36,7 +36,7 @@
         line-height: 1.6;
       }
       .wrap {
-        max-width: 640px;
+        max-width: 80%;
         margin: 0 auto;
         padding: 24px 16px 60px;
       }
@@ -215,10 +215,12 @@
       }
       .group-tag {
         display: inline-block;
-        font-size: 12px;
-        color: var(--muted);
-        background: var(--bg-elev-2);
-        padding: 2px 10px;
+        font-size: 14px;
+        font-weight: 600;
+        color: rgba(255, 209, 128, 0.75);
+        background: var(--accent-bg);
+        border: 1px solid var(--accent);
+        padding: 3px 12px;
         border-radius: 12px;
         margin-bottom: 14px;
       }
@@ -236,6 +238,36 @@
         margin-top: 6px;
         letter-spacing: 1px;
       }
+      .words-toggle {
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 12px;
+      }
+      .words-toggle label {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 13px;
+        font-weight: 400;
+        color: var(--text-soft);
+        cursor: pointer;
+      }
+      .words-toggle input {
+        accent-color: var(--primary);
+        width: 15px;
+        height: 15px;
+        cursor: pointer;
+      }
+      #options {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+      }
+      @media (max-width: 640px) {
+        #options {
+          grid-template-columns: 1fr;
+        }
+      }
       .opt {
         display: block;
         width: 100%;
@@ -244,12 +276,26 @@
         border: 1px solid var(--line);
         border-radius: 10px;
         padding: 12px 14px;
-        margin-bottom: 10px;
         color: var(--text-soft);
         font-size: 14px;
         font-family: inherit;
         line-height: 1.6;
         cursor: pointer;
+      }
+      .opt .opt-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 8px;
+      }
+      .opt .opt-word {
+        display: none;
+        font-size: 13px;
+        font-weight: 600;
+        color: rgba(255, 209, 128, 0.75);
+      }
+      #options.show-words .opt-word {
+        display: inline;
       }
       .opt:hover:not(.locked) {
         border-color: var(--primary);
@@ -306,7 +352,6 @@
       }
       .opt .opt-detail {
         display: inline-block;
-        margin-top: 8px;
         font-size: 12px;
         color: var(--primary);
         background: var(--primary-bg);
@@ -370,6 +415,14 @@
       }
       .modal .tags {
         margin-top: 8px;
+      }
+      .modal .tag {
+        font-size: 14px;
+        font-weight: 600;
+        color: rgba(255, 209, 128, 0.75);
+        background: var(--accent-bg);
+        border: 1px solid var(--accent);
+        padding: 3px 12px;
       }
       .modal .section {
         margin-top: 16px;
@@ -445,6 +498,12 @@
           <span class="group-tag" id="groupTag"></span>
           <div class="term" id="termText"></div>
           <div class="pinyin" id="pinyinText"></div>
+        </div>
+        <div class="words-toggle">
+          <label>
+            <input type="checkbox" id="showWordsToggle" />
+            查看全部成语
+          </label>
         </div>
         <div id="options"></div>
 
@@ -625,7 +684,10 @@
             (o, i) => `
           <div class="opt" data-i="${i}">
             <span class="opt-text">${escapeHtml(o.text)}</span>
-            <span class="opt-detail">详情</span>
+            <div class="opt-footer">
+              <span class="opt-detail">详情</span>
+              <span class="opt-word">${escapeHtml(o.entry.词)}</span>
+            </div>
           </div>`
           )
           .join("");
@@ -787,6 +849,9 @@
       });
       $("btnNext").addEventListener("click", nextQuestion);
       $("btnPrev").addEventListener("click", prevQuestion);
+      $("showWordsToggle").addEventListener("change", (e) => {
+        $("options").classList.toggle("show-words", e.target.checked);
+      });
       $("btnReview").addEventListener("click", startReview);
       $("btnAgain").addEventListener("click", () => {
         showView("pageSetup");
