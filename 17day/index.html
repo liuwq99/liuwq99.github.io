@@ -4,6 +4,12 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>背词计划表</title>
+    <script>
+      try {
+        if (localStorage.getItem("siteTheme") === "bw")
+          document.documentElement.dataset.theme = "bw";
+      } catch (e) {}
+    </script>
     <style>
       :root {
         color-scheme: dark;
@@ -23,6 +29,28 @@
         --weekend: #f48771;
         --error: #f48771;
         --shadow: rgba(0, 0, 0, 0.4);
+        --highlight-bg: rgba(77, 171, 247, 0.08);
+        --on-accent: #0d1117;
+      }
+      :root[data-theme="bw"] {
+        --bg: #000;
+        --bg-elev: #0d0d0d;
+        --bg-elev-2: #171717;
+        --line: #2e2e2e;
+        --text: #f2f2f2;
+        --text-soft: #cfcfcf;
+        --muted: #8a8a8a;
+        --new-bg: rgba(255, 255, 255, 0.1);
+        --new-border: #bdbdbd;
+        --new-text: #e0e0e0;
+        --rev-bg: rgba(255, 255, 255, 0.05);
+        --rev-border: #8a8a8a;
+        --rev-text: #b0b0b0;
+        --weekend: #a0a0a0;
+        --error: #b57f75;
+        --shadow: rgba(0, 0, 0, 0.5);
+        --highlight-bg: rgba(255, 255, 255, 0.06);
+        --on-accent: #111;
       }
       * {
         box-sizing: border-box;
@@ -101,14 +129,14 @@
       }
       .btn-primary {
         background: var(--new-border);
-        color: #0d1117;
+        color: var(--on-accent);
       }
       .btn-primary:hover {
         filter: brightness(1.1);
       }
       .btn-generate {
         background: var(--new-border);
-        color: #0d1117;
+        color: var(--on-accent);
         padding: 10px 26px;
         font-size: 15px;
       }
@@ -290,11 +318,11 @@
       }
       .legend-item.new .tag {
         background: var(--new-border);
-        color: #0d1117;
+        color: var(--on-accent);
       }
       .legend-item.rev .tag {
         background: var(--rev-border);
-        color: #0d1117;
+        color: var(--on-accent);
       }
       .cal-nav {
         display: flex;
@@ -371,7 +399,7 @@
         color: var(--weekend);
       }
       .cal-cell.highlight {
-        background: rgba(77, 171, 247, 0.08);
+        background: var(--highlight-bg);
       }
       .cal-content {
         overflow-y: auto;
@@ -411,7 +439,7 @@
       }
       .cal-item.new .tag {
         background: var(--new-border);
-        color: #0d1117;
+        color: var(--on-accent);
       }
       .cal-item.rev {
         background: var(--rev-bg);
@@ -419,7 +447,7 @@
       }
       .cal-item.rev .tag {
         background: var(--rev-border);
-        color: #0d1117;
+        color: var(--on-accent);
       }
 
       /* 移动端适配 */

@@ -4,6 +4,12 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>查词搜索</title>
+    <script>
+      try {
+        if (localStorage.getItem("siteTheme") === "bw")
+          document.documentElement.dataset.theme = "bw";
+      } catch (e) {}
+    </script>
     <style>
       :root {
         color-scheme: dark;
@@ -20,6 +26,23 @@
         --accent: #ffb74d;
         --accent-bg: rgba(255, 183, 77, 0.12);
         --accent-text: #ffd180;
+        --on-accent: #0d1117;
+      }
+      :root[data-theme="bw"] {
+        --bg: #000;
+        --bg-elev: #0d0d0d;
+        --bg-elev-2: #171717;
+        --line: #2e2e2e;
+        --text: #f2f2f2;
+        --text-soft: #cfcfcf;
+        --muted: #8a8a8a;
+        --primary: #d9d9d9;
+        --primary-dark: #a8a8a8;
+        --primary-bg: rgba(255, 255, 255, 0.08);
+        --accent: #9a9a9a;
+        --accent-bg: rgba(255, 255, 255, 0.06);
+        --accent-text: #b8b8b8;
+        --on-accent: #111;
       }
       * {
         box-sizing: border-box;
@@ -101,7 +124,7 @@
       }
       .btn-primary {
         background: var(--primary);
-        color: #0d1117;
+        color: var(--on-accent);
       }
       .btn-primary:hover {
         filter: brightness(1.1);

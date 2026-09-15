@@ -4,6 +4,12 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>词义练习</title>
+    <script>
+      try {
+        if (localStorage.getItem("siteTheme") === "bw")
+          document.documentElement.dataset.theme = "bw";
+      } catch (e) {}
+    </script>
     <style>
       :root {
         color-scheme: dark;
@@ -24,6 +30,35 @@
         --ok-bg: rgba(81, 207, 102, 0.12);
         --error: #f48771;
         --error-bg: rgba(244, 135, 113, 0.12);
+        --tag-text: rgba(255, 209, 128, 0.75);
+        --ok-tag-bg: rgba(81, 207, 102, 0.18);
+        --error-tag-bg: rgba(244, 135, 113, 0.18);
+        --on-accent: #0d1117;
+        --shadow: rgba(0, 0, 0, 0.4);
+      }
+      :root[data-theme="bw"] {
+        --bg: #000;
+        --bg-elev: #0d0d0d;
+        --bg-elev-2: #171717;
+        --line: #2e2e2e;
+        --text: #f2f2f2;
+        --text-soft: #cfcfcf;
+        --muted: #8a8a8a;
+        --primary: #d9d9d9;
+        --primary-dark: #a8a8a8;
+        --primary-bg: rgba(255, 255, 255, 0.08);
+        --accent: #9a9a9a;
+        --accent-bg: rgba(255, 255, 255, 0.06);
+        --accent-text: #b8b8b8;
+        --tag-text: #b8b8b8;
+        --ok: #7dab88;
+        --ok-bg: rgba(125, 171, 136, 0.1);
+        --error: #b57f75;
+        --error-bg: rgba(181, 127, 117, 0.1);
+        --ok-tag-bg: rgba(125, 171, 136, 0.16);
+        --error-tag-bg: rgba(181, 127, 117, 0.16);
+        --on-accent: #111;
+        --shadow: rgba(0, 0, 0, 0.5);
       }
       * {
         box-sizing: border-box;
@@ -107,7 +142,7 @@
       }
       .btn-primary {
         background: var(--primary);
-        color: #0d1117;
+        color: var(--on-accent);
       }
       .btn-primary:hover:not(:disabled) {
         filter: brightness(1.1);
@@ -137,7 +172,7 @@
         padding: 12px;
         font-size: 14px;
         border-radius: 10px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+        box-shadow: 0 2px 10px var(--shadow);
         writing-mode: vertical-rl;
         letter-spacing: 2px;
       }
@@ -177,7 +212,7 @@
       }
       .badge {
         background: var(--accent);
-        color: #0d1117;
+        color: var(--on-accent);
         font-size: 12px;
         font-weight: 700;
         padding: 3px 10px;
@@ -217,7 +252,7 @@
         display: inline-block;
         font-size: 14px;
         font-weight: 600;
-        color: rgba(255, 209, 128, 0.75);
+        color: var(--tag-text);
         background: var(--accent-bg);
         border: 1px solid var(--accent);
         padding: 3px 12px;
@@ -292,7 +327,7 @@
         display: none;
         font-size: 13px;
         font-weight: 600;
-        color: rgba(255, 209, 128, 0.75);
+        color: var(--tag-text);
       }
       #options.show-words .opt-word {
         display: inline;
@@ -323,11 +358,11 @@
       }
       .opt.correct .opt-tag {
         color: var(--ok);
-        background: rgba(81, 207, 102, 0.18);
+        background: var(--ok-tag-bg);
       }
       .opt.wrong .opt-tag {
         color: var(--error);
-        background: rgba(244, 135, 113, 0.18);
+        background: var(--error-tag-bg);
       }
       .result-num {
         font-size: 40px;
@@ -419,7 +454,7 @@
       .modal .tag {
         font-size: 14px;
         font-weight: 600;
-        color: rgba(255, 209, 128, 0.75);
+        color: var(--tag-text);
         background: var(--accent-bg);
         border: 1px solid var(--accent);
         padding: 3px 12px;

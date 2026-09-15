@@ -4,6 +4,12 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>背词学习入口</title>
+    <script>
+      try {
+        if (localStorage.getItem("siteTheme") === "bw")
+          document.documentElement.dataset.theme = "bw";
+      } catch (e) {}
+    </script>
     <style>
       :root {
         color-scheme: dark;
@@ -16,6 +22,21 @@
         --primary: #4dabf7;
         --primary-dark: #1e88e5;
         --primary-bg: rgba(77, 171, 247, 0.12);
+        --on-accent: #0d1117;
+        --shadow: rgba(0, 0, 0, 0.4);
+      }
+      :root[data-theme="bw"] {
+        --bg: #000;
+        --bg-elev: #0d0d0d;
+        --line: #2e2e2e;
+        --text: #f2f2f2;
+        --text-soft: #cfcfcf;
+        --muted: #8a8a8a;
+        --primary: #d9d9d9;
+        --primary-dark: #a8a8a8;
+        --primary-bg: rgba(255, 255, 255, 0.08);
+        --on-accent: #111;
+        --shadow: rgba(0, 0, 0, 0.5);
       }
       * {
         box-sizing: border-box;
@@ -37,7 +58,7 @@
         margin: 0 auto;
         background: var(--bg-elev);
         border-radius: 12px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+        box-shadow: 0 4px 20px var(--shadow);
         padding: 40px 32px;
         text-align: center;
         border: 1px solid var(--line);
@@ -63,7 +84,7 @@
         font-size: 16px;
         font-weight: 600;
         text-decoration: none;
-        color: #0d1117;
+        color: var(--on-accent);
         background: var(--primary);
         border-radius: 8px;
         transition: background 0.15s ease;
@@ -77,6 +98,36 @@
         font-size: 12px;
         opacity: 0.85;
         margin-top: 4px;
+      }
+      .theme-row {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 26px;
+      }
+      .theme-label {
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .theme-btn {
+        padding: 6px 14px;
+        font-size: 13px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-family: inherit;
+        background: none;
+        border: 1px solid var(--line);
+        color: var(--text-soft);
+      }
+      .theme-btn:hover {
+        border-color: var(--primary);
+        color: var(--primary);
+      }
+      .theme-btn.active {
+        border-color: var(--primary);
+        background: var(--primary-bg);
+        color: var(--primary);
       }
     </style>
   </head>
@@ -102,6 +153,37 @@
           <span class="desc">成语词义选择题，错题回顾</span>
         </a>
       </div>
+      <div class="theme-row">
+        <span class="theme-label">主题</span>
+        <button class="theme-btn" data-theme-choice="dark">🌙 深色</button>
+        <button class="theme-btn" data-theme-choice="bw">⬛ 黑白</button>
+      </div>
     </div>
+
+    <script>
+      const THEME_KEY = "siteTheme";
+      function applyTheme(t) {
+        if (t === "bw")
+          document.documentElement.setAttribute("data-theme", "bw");
+        else document.documentElement.removeAttribute("data-theme");
+        document.querySelectorAll(".theme-btn").forEach((b) => {
+          b.classList.toggle("active", b.dataset.themeChoice === t);
+        });
+      }
+      document.querySelectorAll(".theme-btn").forEach((b) => {
+        b.addEventListener("click", () => {
+          const t = b.dataset.themeChoice;
+          try {
+            localStorage.setItem(THEME_KEY, t);
+          } catch (e) {}
+          applyTheme(t);
+        });
+      });
+      let storedTheme = "dark";
+      try {
+        if (localStorage.getItem(THEME_KEY) === "bw") storedTheme = "bw";
+      } catch (e) {}
+      applyTheme(storedTheme);
+    </script>
   </body>
 </html>

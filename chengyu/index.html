@@ -4,6 +4,12 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>成语实词背词助手</title>
+    <script>
+      try {
+        if (localStorage.getItem("siteTheme") === "bw")
+          document.documentElement.dataset.theme = "bw";
+      } catch (e) {}
+    </script>
     <style>
       :root {
         color-scheme: dark;
@@ -21,6 +27,26 @@
         --accent-bg: rgba(255, 183, 77, 0.12);
         --accent-text: #ffd180;
         --error: #f48771;
+        --tag-text: rgba(255, 209, 128, 0.75);
+        --on-accent: #0d1117;
+      }
+      :root[data-theme="bw"] {
+        --bg: #000;
+        --bg-elev: #0d0d0d;
+        --bg-elev-2: #171717;
+        --line: #2e2e2e;
+        --text: #f2f2f2;
+        --text-soft: #cfcfcf;
+        --muted: #8a8a8a;
+        --primary: #d9d9d9;
+        --primary-dark: #a8a8a8;
+        --primary-bg: rgba(255, 255, 255, 0.08);
+        --accent: #9a9a9a;
+        --accent-bg: rgba(255, 255, 255, 0.06);
+        --accent-text: #b8b8b8;
+        --tag-text: #b8b8b8;
+        --error: #b57f75;
+        --on-accent: #111;
       }
       * {
         box-sizing: border-box;
@@ -84,7 +110,7 @@
       }
       .btn-primary {
         background: var(--primary);
-        color: #0d1117;
+        color: var(--on-accent);
       }
       .btn-primary:hover {
         filter: brightness(1.1);
@@ -161,7 +187,7 @@
       }
       .topbar .mode-badge {
         background: var(--primary);
-        color: #0d1117;
+        color: var(--on-accent);
         font-size: 12px;
         font-weight: 700;
         padding: 3px 10px;
@@ -170,7 +196,7 @@
       }
       .topbar .mode-badge.quiz {
         background: var(--accent);
-        color: #0d1117;
+        color: var(--on-accent);
       }
       .topbar .title {
         font-weight: 700;
@@ -202,7 +228,7 @@
         display: inline-block;
         font-size: 14px;
         font-weight: 600;
-        color: rgba(255, 209, 128, 0.75);
+        color: var(--tag-text);
         background: var(--accent-bg);
         border: 1px solid var(--accent);
         padding: 3px 12px;
