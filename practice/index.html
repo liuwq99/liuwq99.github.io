@@ -169,12 +169,24 @@
         top: 50%;
         transform: translateY(-50%);
         z-index: 40;
-        padding: 12px;
-        font-size: 14px;
-        border-radius: 10px;
-        box-shadow: 0 2px 10px var(--shadow);
-        writing-mode: vertical-rl;
-        letter-spacing: 2px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 44px;
+        height: 44px;
+        padding: 0;
+        font-size: 22px;
+        border-radius: 50%;
+        background: none;
+        border: 1px solid var(--line);
+        color: var(--text-soft);
+        cursor: pointer;
+        font-family: inherit;
+      }
+      .nav-fixed:hover {
+        border-color: var(--primary);
+        color: var(--primary);
+        background: var(--primary-bg);
       }
       #btnPrev {
         left: 10px;
@@ -542,11 +554,11 @@
         </div>
         <div id="options"></div>
 
-        <button class="btn btn-ghost nav-fixed" id="btnPrev" style="display: none">
-          上一题
+        <button class="nav-fixed" id="btnPrev" style="display: none" title="上一题">
+          ←
         </button>
-        <button class="btn btn-primary nav-fixed" id="btnNext" style="display: none">
-          下一题
+        <button class="nav-fixed" id="btnNext" style="display: none" title="下一题">
+          →
         </button>
       </div>
 
@@ -729,8 +741,8 @@
         const opts = Array.from($("options").querySelectorAll(".opt"));
 
         // 导航按钮常显；未作答时点击「下一题」不跳题（见 nextQuestion 守卫）
-        $("btnPrev").style.display = "block";
-        $("btnNext").style.display = "block";
+        $("btnPrev").style.display = "flex";
+        $("btnNext").style.display = "flex";
         if (reviewMode) {
           // 回顾模式：进入即标识正确项与当时选错的项，不可再作答
           locked = true;
@@ -743,7 +755,7 @@
             }
             if (o.entry === q.picked) opts[i].classList.add("wrong");
           });
-          $("btnNext").textContent =
+          $("btnNext").title =
             idx === session.questions.length - 1 ? "完成回顾" : "下一题";
         } else {
           // 练习模式：已答过的题回显作答情况，未答的题正常作答
@@ -759,10 +771,10 @@
               }
               if (!ans.ok && o.entry === ans.picked) opts[i].classList.add("wrong");
             });
-            $("btnNext").textContent =
+            $("btnNext").title =
               idx === session.questions.length - 1 ? "查看结果" : "下一题";
           } else {
-            $("btnNext").textContent = "下一题";
+            $("btnNext").title = "下一题";
           }
         }
       }
@@ -802,8 +814,8 @@
           btn.classList.add("wrong");
           session.wrong.push({ entry: q, picked: picked.entry });
           renderScore();
-          $("btnNext").style.display = "block";
-          $("btnNext").textContent =
+          $("btnNext").style.display = "flex";
+          $("btnNext").title =
             idx === session.questions.length - 1 ? "查看结果" : "下一题";
         }
       }

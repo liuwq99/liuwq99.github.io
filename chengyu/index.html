@@ -304,10 +304,6 @@
         justify-content: space-between;
         gap: 10px;
       }
-      .bottom-bar .nav-btn {
-        flex: 1;
-        max-width: 130px;
-      }
       .progress {
         flex: 1;
         text-align: center;
@@ -328,6 +324,41 @@
         background: var(--primary);
         width: 0;
         transition: width 0.2s;
+      }
+      /* ---- 左右固定翻页箭头 ---- */
+      .nav-arrow {
+        position: fixed;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 40;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 44px;
+        height: 44px;
+        padding: 0;
+        font-size: 22px;
+        border-radius: 50%;
+        background: none;
+        border: 1px solid var(--line);
+        color: var(--text-soft);
+        cursor: pointer;
+        font-family: inherit;
+      }
+      .nav-arrow:hover:not(:disabled) {
+        border-color: var(--primary);
+        color: var(--primary);
+        background: var(--primary-bg);
+      }
+      .nav-arrow:disabled {
+        opacity: 0.4;
+        cursor: default;
+      }
+      #btnPrev {
+        left: 10px;
+      }
+      #btnNext {
+        right: 10px;
       }
     </style>
   </head>
@@ -397,13 +428,14 @@
         </div>
 
         <div class="bottom-bar">
-          <button class="btn btn-ghost nav-btn" id="btnPrev">← 上一个</button>
           <div class="progress">
             <div class="num" id="progressText"></div>
             <div class="bar"><div class="bar-inner" id="progressBar"></div></div>
           </div>
-          <button class="btn btn-primary nav-btn" id="btnNext">下一个 →</button>
         </div>
+
+        <button class="nav-arrow" id="btnPrev" title="上一个">←</button>
+        <button class="nav-arrow" id="btnNext" title="下一个">→</button>
       </div>
     </div>
 
