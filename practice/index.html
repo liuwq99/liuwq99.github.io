@@ -554,12 +554,8 @@
         </div>
         <div id="options"></div>
 
-        <button class="nav-fixed" id="btnPrev" style="display: none" title="上一题">
-          ←
-        </button>
-        <button class="nav-fixed" id="btnNext" style="display: none" title="下一题">
-          →
-        </button>
+        <button class="nav-fixed" id="btnPrev" style="display: none">←</button>
+        <button class="nav-fixed" id="btnNext" style="display: none">→</button>
       </div>
 
       <!-- 结果页 -->
@@ -755,8 +751,6 @@
             }
             if (o.entry === q.picked) opts[i].classList.add("wrong");
           });
-          $("btnNext").title =
-            idx === session.questions.length - 1 ? "完成回顾" : "下一题";
         } else {
           // 练习模式：已答过的题回显作答情况，未答的题正常作答
           const ans = session.answers[idx];
@@ -771,10 +765,6 @@
               }
               if (!ans.ok && o.entry === ans.picked) opts[i].classList.add("wrong");
             });
-            $("btnNext").title =
-              idx === session.questions.length - 1 ? "查看结果" : "下一题";
-          } else {
-            $("btnNext").title = "下一题";
           }
         }
       }
@@ -815,8 +805,6 @@
           session.wrong.push({ entry: q, picked: picked.entry });
           renderScore();
           $("btnNext").style.display = "flex";
-          $("btnNext").title =
-            idx === session.questions.length - 1 ? "查看结果" : "下一题";
         }
       }
 
